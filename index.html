@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Viewer App</title>
+  <style>
+    #app {
+      height: 100vh;
+      width: 100%;
+
+
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .toolbar {
+      position: fixed;
+      top: 50%;
+      right: 50px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-radius: 8px 0 0 8px;
+      box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.2);
+
+    }
+
+    .toolbar button {
+      background: linear-gradient(135deg, #4f46e5, #3b82f6);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .toolbar button:hover {
+      background: linear-gradient(135deg, #4338ca, #2563eb);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transform: translateX(-2px);
+    }
+
+    .toolbar button:active {
+      transform: scale(0.98);
+      background: linear-gradient(135deg, #3730a3, #1d4ed8);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app"></div>
+ <div class="toolbar">
+  <button id="toggleViewsBtn">Toggle 2D/3D</button>
+  <button id="toggleModeBtn">Toggle Create/Select</button>
+  <button id="zoomFitBtn">Zoom Fit</button>
+   <button id="modeRoomBtn">Room</button>
+</div>
+  <div class="dimension-display" style="
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-family: Arial;
+">
+  Selected Wall Length: <span id="wallLength">0</span> meters
+</div>
+
+  <script type="module">
+    import { Viewer } from './src/Viewer.ts'
+
+    const container = document.querySelector('#app');
+    const viewer = new Viewer(container);
+    viewer.animate();
+    var is2D = true
+    viewer.setView('2d')
+    //  if(viewer.activeDocument instanceof Document2D){
+    //    var doc2=viewer.activeDocument ;
+
+    //  }
+
+    document.querySelector('#toggleViewsBtn')?.addEventListener('click', () => {
+      is2D=!is2D;
+      viewer.setView(is2D?'2d':'3d')
+      
+    }
+    )
+
+    document.querySelector('#zoomFitBtn')?.addEventListener('click', () => {
+
+      viewer.zoomFit(1);
+
+    })
+
+  </script>
+</body>
+
+</html>
