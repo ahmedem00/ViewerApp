@@ -24,7 +24,7 @@ class Document2D implements IDocument{
         this.camera=this.createCamera();
         new Resizer(canvas,this.camera);
         this.controls=this.addControls();
-        this.addCube();
+     
         this.addGridHelper();
         (this as any).viewerRef = viewerRef;
         // document.addEventListener('mousedown',this.onMouseDown.bind(this)); 
