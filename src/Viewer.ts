@@ -1,4 +1,4 @@
-import { AxesHelper, BoxGeometry, Color, GridHelper, MathUtils, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
+import { AxesHelper, BoxGeometry, Color, GridHelper, MathUtils, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Scene, Vector2, Vector3, WebGLRenderer } from 'three';
 import { Resizer } from './resizer';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Document2D } from './documents/Document2D';
@@ -6,13 +6,19 @@ import type { IDocument } from './documents/IDocument';
 import { Document3D } from './documents/Document3D';
 import { CreateWallCommand } from './commands/CreateWallCommand';
 
-
+interface Wall {
+    type: 'wall';
+    start: Vector3;
+    end: Vector3;
+    angle: number;
+    length: number;
+}
 class Viewer {
     container;
     renderer;
     document2D: Document2D;
     document3D: Document3D;
-    private walls: Vector3[] = [];
+    private walls: Wall[] = []; // Replace the old walls array with this
 
     activeDocument: IDocument;
     constructor(container: HTMLElement) {
@@ -80,27 +86,32 @@ class Viewer {
     zoomFit() {
         this.activeDocument.zoomFit();
     }
-    addWall(start: Vector3, end: Vector3) {
-        // Convert 2D coordinates (XY) to 3D XZ plane
-        const start3D = new Vector3(start.x, 0, start.y); // Y becomes Z
-        const end3D = new Vector3(end.x, 0, end.y);       // Y becomes Z
-        this.walls.push(start3D, end3D);
+      addWall(start: Vector3, end: Vector3) {
+        const wallVec = new Vector2(end.x - start.x, end.y - start.y);
+        const length = wallVec.length();
+        const angle = Math.atan2(wallVec.y, wallVec.x);
+        
+        const wall: Wall = {
+            type: 'wall',
+            start: new Vector3(start.x, 0, start.y), // Convert to 3D coordinates (XZ plane)
+            end: new Vector3(end.x, 0, end.y),      // Convert to 3D coordinates (XZ plane)
+            angle,
+            length
+        };
+        
+        this.walls.push(wall);
         this.syncWallsTo3D();
     }
     private syncWallsTo3D() {
         // Clear existing 3D walls
-        this.document3D.clearWalls();
-
-        // Create 3D representations
-        for (let i = 0; i < this.walls.length; i += 2) {
-            const start = this.walls[i];
-            const end = this.walls[i + 1];
-            this.document3D.create3DWall(start, end);
-        }
+         this.document3D.clearWalls();
+        this.walls.forEach(wall => {
+            this.document3D.create3DWall(wall);
+        });
     }
     toggleMode(mode: 'create' | 'select') {
         this.document2D.toggleMode(mode);
     }
 }
 
-export { Viewer };
+export { Viewer };export type { Wall };
